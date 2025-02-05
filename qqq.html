@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои конспекты</title>
+    <style>
+        /* Стили как в Obsidian (тёмная тема) */
+        :root {
+            --bg: #1a1a1a;
+            --text: #e0e0e0;
+            --accent: #7f6df2;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Стили для конспектов */
+        .note {
+            background: #2d2d2d;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        /* Навигация */
+        .nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📚 Мои конспекты</h1>
+        <div class="nav">
+            <a href="#math">Математика</a>
+            <a href="#physics">Физика</a>
+            <a href="#programming">Программирование</a>
+        </div>
+    </header>
+
+    <!-- Пример конспекта -->
+    <div class="note" id="math">
+        <h2>📐 Линейная алгебра</h2>
+        <p><strong>Дата:</strong> 15.10.2023</p>
+        
+        <h3>Основные понятия:</h3>
+        <ul>
+            <li>Вектор — упорядоченный набор чисел</li>
+            <li>Матрица — таблица чисел</li>
+            <li>Определитель — скалярная характеристика матрицы</li>
+        </ul>
+
+        <h3>Формула:</h3>
+        <p>Определитель матрицы 2×2:</p>
+        <pre>|a  b|
+|c  d| = ad - bc</pre>
+    </div>
+
+    <!-- Добавь больше блоков .note с другими конспектами -->
+    
+    <footer>
+        <p>© 2023 · Сделано с ❤️ в Obsidian</p>
+    </footer>
+</body>
+</html>

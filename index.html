@@ -3,68 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мои конспекты</title>
-    <style>
-        /* Стили как в Obsidian (тёмная тема) */
-        :root {
-            --bg: #1a1a1a;
-            --text: #e0e0e0;
-            --accent: #7f6df2;
-        }
-
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: var(--bg);
-            color: var(--text);
-        }
-
-        a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* Стили для конспектов */
-        .note {
-            background: #2d2d2d;
-            padding: 25px;
-            border-radius: 10px;
-            margin: 20px 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-        }
-
-        /* Навигация */
-        .nav {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-    </style>
+    <title>Главная - Мои конспекты</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>📚 Мои конспекты</h1>
-        <div class="nav">
-            <a href="#math">ПОИС</a>
-            <a href="#physics">АЦЭ</a>
+        <h1>Информационные системы (ИС)</h1>
+        
+        <div class="semester-nav">
+            <span class="semester-link disabled">1 семестр</span>
+            <a href="#semester2" class="semester-link">2 семестр</a>
         </div>
+
+        <nav class="nav">
+            <a href="index.html" class="active">Главная</a>
+            <a href="pois.html">ПОИС</a>
+            <a href="ace.html">АЦЭ</a>
+        </nav>
     </header>
 
-    <!-- Пример конспекта -->
-    <div class="note" id="math">
-        <h2>Программное обеспечение информационных систем</h2>
-        <p><strong>Дата:</strong> 06.02.2025</p>
+    <div class="note">
+        <h2>Добро пожаловать!</h2>
+        <p>Выберите предмет из навигационного меню для просмотра конспектов.</p>
+        <ul>
+            <li><strong>ПОИС</strong> - Программное обеспечение информационных систем</li>
+            <li><strong>АЦЭ</strong> - Анализ цифровых электронных схем</li>
+        </ul>
     </div>
 
-    <!-- Добавь больше блоков .note с другими конспектами -->
-    
     <footer>
         <p>© 2025 · by marshel</p>
     </footer>

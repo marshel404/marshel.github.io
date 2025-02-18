@@ -1,906 +1,1175 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ПОИС</title>
-    <link rel="stylesheet" href="styles.css" />
-    <style>
-      /* Общие стили для навигации */
-      .lecture-nav {
-        display: flex;
-        gap: 10px;
-        margin: 20px 0;
-        flex-wrap: wrap;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ПОИС</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Стили для навигации по ключевым словам */
+    .keyword-nav {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .keyword-btn {
+      padding: 8px 16px;
+      border: 2px solid var(--accent);
+      border-radius: 25px;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+      text-decoration: none;
+      /* Убираем подчёркивание у ссылок */
+    }
+
+    .keyword-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    /* Стили для навигации по ключевым словам */
+    .keyword-nav {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .keyword-btn {
+      padding: 8px 16px;
+      border: 2px solid var(--accent);
+      border-radius: 25px;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+      text-decoration: none;
+    }
+
+    .keyword-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    /* Стили для навигации лекций и практик */
+    .lecture-nav,
+    .practice-nav {
+      display: flex;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    .lecture-btn,
+    .practice-btn {
+      padding: 8px 16px;
+      border: 2px solid var(--accent);
+      border-radius: 25px;
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .lecture-btn:hover,
+    .lecture-btn:focus-visible,
+    .practice-btn:hover,
+    .practice-btn:focus-visible {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .lecture-btn.active,
+    .practice-btn.active {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .lecture-btn.disabled,
+    .practice-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+      border-color: var(--disabled);
+    }
+
+    /* Стили для лекций и компонентов */
+    .lecture,
+    .practice {
+      margin: 40px 0;
+      padding: 20px;
+      border-left: 3px solid var(--accent);
+      display: none;
+      /* По умолчанию скрываем все блоки */
+    }
+
+    .lecture.active,
+    .practice.active {
+      display: block;
+      /* Показываем активный блок */
+    }
+
+    .lecture h2,
+    .practice h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+      padding-top: 0;
+    }
+
+    .component-block {
+      background: #333333;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      position: relative;
+      border: 1px solid #404040;
+    }
+
+    .component-icon {
+      font-size: 2em;
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      opacity: 0.3;
+    }
+
+    /* Стили для таблиц */
+    .cpu-components {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.95em;
+    }
+
+    .cpu-components thead {
+      background: #2a2a2a;
+      border-bottom: 2px solid #404040;
+      /* Тёмно-серая граница */
+    }
+
+    .cpu-components th {
+      padding: 14px;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      color: var(--text);
+      /* Цвет текста из общей темы */
+      border: 1px solid #404040;
+      /* Тёмно-серая граница */
+    }
+
+    .cpu-components td {
+      padding: 12px;
+      border: 1px solid #404040;
+      /* Тёмно-серая граница */
+      vertical-align: top;
+    }
+
+    /* Стили для списков */
+    .spec-list,
+    .cache-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .spec-list li,
+    .cache-list li {
+      padding: 6px 0;
+      text-align: left;
+      border-bottom: 1px dashed #505050;
+    }
+
+    .spec-list li:last-child,
+    .cache-list li:last-child {
+      border-bottom: none;
+    }
+
+    /* Стили для пошагового списка */
+    .work-steps {
+      counter-reset: step;
+      padding-left: 0;
+      margin: 25px 0;
+      list-style: none;
+    }
+
+    .work-steps li {
+      position: relative;
+      margin: 18px 0;
+      padding-left: 40px;
+      line-height: 1.7;
+      border-bottom: none;
+      /* Убираем пунктирные линии */
+    }
+
+    .work-steps li:before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0;
+      /* Цифра начинается с верхнего края текста */
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg);
+      text-align: center;
+      line-height: 26px;
+      /* Центрируем цифру внутри круга */
+      font-size: 0.9em;
+      font-weight: 700;
+    }
+
+    /* Адаптивные стили */
+    @media (max-width: 768px) {
+      .cpu-components th {
+        padding: 12px;
       }
 
-      .lecture-btn {
-        padding: 8px 16px;
-        border: 2px solid var(--accent);
-        border-radius: 25px;
-        background: transparent;
-        color: var(--text);
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .lecture-btn:hover,
-      .lecture-btn:focus-visible {
-        background: var(--accent);
-        color: var(--bg);
-      }
-
-      .lecture-btn.active {
-        background: var(--accent);
-        color: var(--bg);
-      }
-
-      .lecture-btn.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        pointer-events: none;
-        border-color: var(--disabled);
-      }
-
-      /* Стили для лекций и компонентов */
-      .lecture {
-        margin: 40px 0;
-        padding: 20px;
-        border-left: 3px solid var(--accent);
-      }
-
-      /* Стили для заголовка лекции */
-      .lecture h2 {
-        margin-top: 0; /* Убираем отступ сверху */
-        margin-bottom: 20px; /* Оставляем отступ снизу */
-        font-size: 1.8em; /* Размер шрифта */
-        padding-top: 0; /* Убираем внутренний отступ сверху */
-      }
-
-      .component-block {
-        background: #333333;
-        padding: 20px;
-        border-radius: 8px;
-        margin: 20px 0;
-        position: relative;
-        border: 1px solid #404040;
+      .work-steps li {
+        padding-left: 35px;
       }
 
       .component-icon {
-        font-size: 2em;
-        position: absolute;
-        right: 20px;
-        top: 20px;
-        opacity: 0.3;
+        display: none;
       }
+    }
 
-      /* Стили для таблиц */
+    @media (max-width: 600px) {
       .cpu-components {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        font-size: 0.95em;
-      }
-
-      .cpu-components thead {
-        background: #2a2a2a;
-        border-bottom: 2px solid #404040; /* Тёмно-серая граница */
-      }
-
-      .cpu-components th {
-        padding: 14px;
-        text-align: center;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        color: var(--text); /* Цвет текста из общей темы */
-        border: 1px solid #404040; /* Тёмно-серая граница */
-      }
-
-      .cpu-components td {
-        padding: 12px;
-        border: 1px solid #404040; /* Тёмно-серая граница */
-        vertical-align: top;
-      }
-
-      /* Стили для списков */
-      .spec-list,
-      .cache-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+        display: block;
+        overflow-x: auto;
       }
 
       .spec-list li,
       .cache-list li {
-        padding: 6px 0;
-        text-align: left;
-        border-bottom: 1px dashed #505050;
+        flex-direction: column;
+        gap: 4px;
       }
+    }
 
-      .spec-list li:last-child,
-      .cache-list li:last-child {
-        border-bottom: none;
-      }
+    /* Стили для компонентов процессора */
+    .cpu-component {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 3px solid var(--accent);
+    }
 
-      /* Стили для пошагового списка */
-      .work-steps {
-        counter-reset: step;
-        padding-left: 0;
-        margin: 25px 0;
-        list-style: none;
-      }
+    .cpu-component h4 {
+      margin-top: 0;
+      color: var(--accent);
+    }
 
-      .work-steps li {
-        position: relative;
-        margin: 18px 0;
-        padding-left: 40px;
-        line-height: 1.7;
-        border-bottom: none; /* Убираем пунктирные линии */
-      }
+    .cpu-component p {
+      margin: 0 0 15px 0;
+      line-height: 1.7;
+    }
 
-      .work-steps li:before {
-        counter-increment: step;
-        content: counter(step);
-        position: absolute;
-        left: 0;
-        top: 0; /* Цифра начинается с верхнего края текста */
-        width: 26px;
-        height: 26px;
-        border-radius: 50%;
-        background: var(--accent);
-        color: var(--bg);
-        text-align: center;
-        line-height: 26px; /* Центрируем цифру внутри круга */
-        font-size: 0.9em;
-        font-weight: 700;
-      }
+    .workflow-step {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin: 15px 0;
+    }
 
-      /* Адаптивные стили */
-      @media (max-width: 768px) {
-        .cpu-components th {
-          padding: 12px;
-        }
+    .step-number {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg);
+      text-align: center;
+      line-height: 30px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
 
-        .work-steps li {
-          padding-left: 35px;
-        }
+    .step-description {
+      flex-grow: 1;
+    }
 
-        .component-icon {
-          display: none;
-        }
-      }
-
-      @media (max-width: 600px) {
-        .cpu-components {
-          display: block;
-          overflow-x: auto;
-        }
-
-        .spec-list li,
-        .cache-list li {
-          flex-direction: column;
-          gap: 4px;
-        }
-      }
-
-      /* Стили для компонентов процессора */
-      .cpu-component {
-        background: #2a2a2a;
-        padding: 20px;
-        border-radius: 8px;
-        margin: 20px 0;
-        border-left: 3px solid var(--accent);
-      }
-
-      .cpu-component h4 {
-        margin-top: 0;
-        color: var(--accent);
-      }
-
-      .cpu-component p {
-        margin: 0 0 15px 0;
-        line-height: 1.7;
-      }
-
+    /* Адаптивные стили */
+    @media (max-width: 600px) {
       .workflow-step {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin: 15px 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
       }
 
       .step-number {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        background: var(--accent);
-        color: var(--bg);
-        text-align: center;
-        line-height: 30px;
-        font-weight: 700;
-        flex-shrink: 0;
+        margin-bottom: 10px;
       }
+    }
 
-      .step-description {
-        flex-grow: 1;
-      }
+    /* Стили для таблицы сравнения */
+    .storage-table {
+      width: 100%;
+      border-collapse: separate;
+      /* Разделяем границы ячеек */
+      border-spacing: 0;
+      /* Убираем отступы между ячейками */
+      margin: 20px 0;
+      font-size: 0.95em;
+      border-radius: 10px;
+      /* Скруглённые углы */
+      overflow: hidden;
+      /* Скрываем углы за пределами таблицы */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      /* Тень для таблицы */
+    }
 
-      /* Адаптивные стили */
-      @media (max-width: 600px) {
-        .workflow-step {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 10px;
-        }
+    .storage-table thead {
+      background: #2a2a2a;
+      border-bottom: 2px solid #404040;
+      /* Тёмно-серая граница */
+    }
 
-        .step-number {
-          margin-bottom: 10px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <h1>📚 Программное обеспечение ИС</h1>
+    .storage-table th {
+      padding: 14px;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      color: var(--text);
+      /* Цвет текста из общей темы */
+      border: 1px solid #404040;
+      /* Тёмно-серая граница */
+    }
 
-      <div class="semester-nav">
-        <span class="semester-link disabled">1 семестр</span>
-        <a href="#semester2" class="semester-link">2 семестр</a>
-      </div>
+    .storage-table td {
+      padding: 12px;
+      border: 1px solid #404040;
+      /* Тёмно-серая граница */
+      vertical-align: top;
+      text-align: center;
+    }
 
-      <nav class="nav">
-        <a href="index.html">Главная</a>
-        <a href="pois.html" class="active">ПОИС</a>
-        <a href="ace.html">АЦЭ</a>
-      </nav>
-    </header>
+    /* Скруглённые углы для первой и последней ячейки в заголовке */
+    .storage-table th:first-child {
+      border-top-left-radius: 10px;
+    }
 
-    <div class="lecture-nav">
-      <button class="lecture-btn active" onclick="showLecture(1)">
-        Лекция 1
-      </button>
-      <button class="lecture-btn disabled" onclick="showLecture(2)">
-        Лекция 2
-      </button>
+    .storage-table th:last-child {
+      border-top-right-radius: 10px;
+    }
+
+    /* Скруглённые углы для первой и последней ячейки в последней строке */
+    .storage-table tr:last-child td:first-child {
+      border-bottom-left-radius: 10px;
+    }
+
+    .storage-table tr:last-child td:last-child {
+      border-bottom-right-radius: 10px;
+    }
+
+    /* Подсветка строк при наведении */
+    .storage-table tbody tr:hover {
+      background-color: #3a3a3a;
+      /* Цвет фона при наведении */
+      transition: background-color 0.3s ease;
+      /* Плавный переход */
+    }
+
+    /* Общие стили для практики */
+  .practice {
+    background-color: var(--bg);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 20px 0;
+  }
+
+  .practice h2 {
+    color: var(--accent);
+    font-size: 2em;
+    margin-bottom: 20px;
+  }
+
+  .practice h3 {
+    color: var(--accent);
+    font-size: 1.5em;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 5px;
+  }
+
+  .practice p {
+    line-height: 1.7;
+    margin-bottom: 15px;
+  }
+
+  .practice ul,
+  .practice ol {
+    margin-left: 20px;
+    margin-bottom: 20px;
+  }
+
+  .practice li {
+    margin-bottom: 10px;
+  }
+
+  .practice img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 15px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .practice a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .practice a:hover {
+    text-decoration: underline;
+  }
+
+  /* Стили для блоков с шагами */
+  .step-block {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid var(--accent);
+  }
+
+  .step-block h4 {
+    margin-top: 0;
+    color: var(--accent);
+  }
+
+  .step-block ul {
+    margin: 10px 0;
+  }
+
+  .step-block li {
+    margin-bottom: 8px;
+  }
+
+  /* Стили для кнопок и выделений */
+  .code {
+    background-color: #333333;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #f8f8f8;
+  }
+
+  .note {
+    background-color: #3a3a3a;
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 4px solid #ffcc00;
+    margin: 15px 0;
+  }
+
+  .note strong {
+    color: #ffcc00;
+  }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>📚 Программное обеспечение ИС</h1>
+
+    <div class="semester-nav">
+      <span class="semester-link disabled">1 семестр</span>
+      <a href="#semester2" class="semester-link">2 семестр</a>
     </div>
 
-    <div id="lecture-1" class="lecture">
-      <h2>Лекция 1</h2>
-      <p><strong>Дата:</strong> 06.02.2025</p>
+    <nav class="nav">
+      <a href="index.html">Главная</a>
+      <a href="pois.html" class="active">ПОИС</a>
+      <a href="ace.html">АЦЭ</a>
+    </nav>
+  </header>
 
-      <div class="component-block">
-        <div class="component-icon">⚙️</div>
-        <h3>1. Центральный процессор (CPU)</h3>
+  <!-- Навигация по лекциям -->
+  <div class="lecture-nav">
+    <button class="lecture-btn active" onclick="showTab('lecture', 0)">
+      Лекция 0
+    </button>
+    <button class="lecture-btn" onclick="showTab('lecture', 1)">
+      Лекция 1
+    </button>
+  </div>
 
-        <!-- Устройство управления -->
-        <div class="cpu-component">
-          <h4>Устройство управления (УУ, CU)</h4>
-          <p>
-            Устройство управления — это "дирижёр" процессора. Оно координирует
-            работу всех компонентов, управляет потоком данных и интерпретирует
-            команды, поступающие из памяти.
-          </p>
-          <ul class="spec-list">
-            <li><strong>Функция:</strong> Управление выполнением команд</li>
-            <li>
-              <strong>Основные задачи:</strong> Декодирование инструкций,
-              управление шинами данных
-            </li>
-            <li>
-              <strong>Пример:</strong> Декодер команд в современных процессорах
-            </li>
-          </ul>
-        </div>
+  <!-- Навигация по практикам -->
+  <div class="practice-nav">
+    <button class="practice-btn" onclick="showTab('practice', 0)">
+      Практика 1
+    </button>
+    <button class="practice-btn" onclick="showTab('practice', 1)">
+      Практика 2
+    </button>
+  </div>
 
-        <!-- Арифметико-логическое устройство -->
-        <div class="cpu-component">
-          <h4>Арифметико-логическое устройство (АЛУ, ALU)</h4>
-          <p>
-            АЛУ — это "вычислительный центр" процессора. Оно выполняет все
-            арифметические (сложение, вычитание) и логические (сравнение,
-            побитовые операции) действия.
-          </p>
-          <ul class="spec-list">
-            <li><strong>Функция:</strong> Выполнение вычислений</li>
-            <li>
-              <strong>Основные операции:</strong> Сложение, вычитание, AND, OR,
-              XOR
-            </li>
-            <li>
-              <strong>Пример:</strong> 64-битные целочисленные операции в
-              современных CPU
-            </li>
-          </ul>
-        </div>
 
-        <!-- Регистры -->
-        <div class="cpu-component">
-          <h4>Регистры</h4>
-          <p>
-            Регистры — это сверхбыстрая память внутри процессора. Они временно
-            хранят данные и команды, с которыми процессор работает в текущий
-            момент.
-          </p>
-          <ul class="spec-list">
-            <li><strong>Функция:</strong> Временное хранение данных</li>
-            <li><strong>Типы:</strong> Аккумулятор, индексные, указатели</li>
-            <li>
-              <strong>Размер:</strong> 64-512 бит (в современных процессорах)
-            </li>
-          </ul>
-        </div>
+  <div id="lecture-0" class="lecture active">
+    <h2>Лекция 0</h2>
+    <p><strong>Дата:</strong> 06.02.2025</p>
 
-        <!-- Кэш-память -->
-        <div class="cpu-component">
-          <h4>Кэш-память (cache)</h4>
-          <p>
-            Кэш-память — это высокоскоростной буфер между процессором и
-            оперативной памятью. Она хранит часто используемые данные, чтобы
-            ускорить доступ к ним.
-          </p>
-          <ul class="spec-list">
-            <li><strong>Функция:</strong> Ускорение доступа к данным</li>
-            <li>
-              <strong>Уровни:</strong>
-              <ul>
-                <li>L1: 32-64 KB (самый быстрый)</li>
-                <li>L2: 256 KB - 2 MB</li>
-                <li>L3: 8-64 MB (общий для всех ядер)</li>
-              </ul>
-            </li>
-          </ul>
-        </div>
+    <!-- Навигация по ключевым словам -->
+    <div class="keyword-nav">
+      <a href="#cpu" class="keyword-btn">1. Центральный процессор (CPU)</a>
+      <a href="#ram" class="keyword-btn">2. Оперативная память (RAM)</a>
+      <a href="#gpu" class="keyword-btn">3. Видеокарта (GPU)</a>
+      <a href="#motherboard" class="keyword-btn">4. Материнская плата</a>
+      <a href="#storage" class="keyword-btn">5. Накопители данных</a>
+      <a href="#bios" class="keyword-btn">6. BIOS/UEFI</a>
+    </div>
 
-        <!-- Генератор тактовых импульсов -->
-        <div class="cpu-component">
-          <h4>Генератор тактовых импульсов</h4>
-          <p>
-            Генератор тактовых импульсов синхронизирует работу всех компонентов
-            процессора. Он создаёт регулярные электрические импульсы (такты),
-            которые определяют, когда процессор должен выполнять каждую
-            операцию.
-          </p>
-          <ul class="spec-list">
-            <li><strong>Функция:</strong> Синхронизация операций</li>
-            <li>
-              <strong>Частота:</strong> 1-5 ГГц (в современных процессорах)
-            </li>
-            <li><strong>Тип:</strong> Встроенный кварцевый генератор</li>
-          </ul>
-        </div>
+    <div id="cpu" class="component-block">
+      <div class="component-icon">⚙️</div>
+      <h3>1. Центральный процессор (CPU)</h3>
 
-        <!-- Принцип работы процессора -->
-        <div class="cpu-component">
-          <h4>Принцип работы процессора</h4>
-          <div class="workflow-step">
-            <div class="step-number">1</div>
-            <div class="step-description">
-              <strong>Выборка инструкции</strong><br />
-              Процессор получает команду из оперативной памяти.
-            </div>
+      <!-- Устройство управления -->
+      <div class="cpu-component">
+        <h4>Устройство управления (УУ, CU)</h4>
+        <p>
+          Устройство управления — это "дирижёр" процессора. Оно координирует
+          работу всех компонентов, управляет потоком данных и интерпретирует
+          команды, поступающие из памяти.
+        </p>
+        <ul class="spec-list">
+          <li><strong>Функция:</strong> Управление выполнением команд</li>
+          <li>
+            <strong>Основные задачи:</strong> Декодирование инструкций,
+            управление шинами данных
+          </li>
+          <li>
+            <strong>Пример:</strong> Декодер команд в современных процессорах
+          </li>
+        </ul>
+      </div>
+
+      <!-- Арифметико-логическое устройство -->
+      <div class="cpu-component">
+        <h4>Арифметико-логическое устройство (АЛУ, ALU)</h4>
+        <p>
+          АЛУ — это "вычислительный центр" процессора. Оно выполняет все
+          арифметические (сложение, вычитание) и логические (сравнение,
+          побитовые операции) действия.
+        </p>
+        <ul class="spec-list">
+          <li><strong>Функция:</strong> Выполнение вычислений</li>
+          <li>
+            <strong>Основные операции:</strong> Сложение, вычитание, AND, OR,
+            XOR
+          </li>
+          <li>
+            <strong>Пример:</strong> 64-битные целочисленные операции в
+            современных CPU
+          </li>
+        </ul>
+      </div>
+
+      <!-- Регистры -->
+      <div class="cpu-component">
+        <h4>Регистры</h4>
+        <p>
+          Регистры — это сверхбыстрая память внутри процессора. Они временно
+          хранят данные и команды, с которыми процессор работает в текущий
+          момент.
+        </p>
+        <ul class="spec-list">
+          <li><strong>Функция:</strong> Временное хранение данных</li>
+          <li><strong>Типы:</strong> Аккумулятор, индексные, указатели</li>
+          <li>
+            <strong>Размер:</strong> 64-512 бит (в современных процессорах)
+          </li>
+        </ul>
+      </div>
+
+      <!-- Кэш-память -->
+      <div class="cpu-component">
+        <h4>Кэш-память (cache)</h4>
+        <p>
+          Кэш-память — это высокоскоростной буфер между процессором и
+          оперативной памятью. Она хранит часто используемые данные, чтобы
+          ускорить доступ к ним.
+        </p>
+        <ul class="spec-list">
+          <li><strong>Функция:</strong> Ускорение доступа к данным</li>
+          <li>
+            <strong>Уровни:</strong>
+            <ul>
+              <li>L1: 32-64 KB (самый быстрый)</li>
+              <li>L2: 256 KB - 2 MB</li>
+              <li>L3: 8-64 MB (общий для всех ядер)</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Генератор тактовых импульсов -->
+      <div class="cpu-component">
+        <h4>Генератор тактовых импульсов</h4>
+        <p>
+          Генератор тактовых импульсов синхронизирует работу всех компонентов
+          процессора. Он создаёт регулярные электрические импульсы (такты),
+          которые определяют, когда процессор должен выполнять каждую
+          операцию.
+        </p>
+        <ul class="spec-list">
+          <li><strong>Функция:</strong> Синхронизация операций</li>
+          <li>
+            <strong>Частота:</strong> 1-5 ГГц (в современных процессорах)
+          </li>
+          <li><strong>Тип:</strong> Встроенный кварцевый генератор</li>
+        </ul>
+      </div>
+
+      <!-- Принцип работы процессора -->
+      <div class="cpu-component">
+        <h4>Принцип работы процессора</h4>
+        <div class="workflow-step">
+          <div class="step-number">1</div>
+          <div class="step-description">
+            <strong>Выборка инструкции</strong><br />
+            Процессор получает команду из оперативной памяти.
           </div>
-          <div class="workflow-step">
-            <div class="step-number">2</div>
-            <div class="step-description">
-              <strong>Декодирование</strong><br />
-              УУ расшифровывает команду.
-            </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-number">2</div>
+          <div class="step-description">
+            <strong>Декодирование</strong><br />
+            УУ расшифровывает команду.
           </div>
-          <div class="workflow-step">
-            <div class="step-number">3</div>
-            <div class="step-description">
-              <strong>Исполнение</strong><br />
-              АЛУ выполняет арифметическую или логическую операцию.
-            </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-number">3</div>
+          <div class="step-description">
+            <strong>Исполнение</strong><br />
+            АЛУ выполняет арифметическую или логическую операцию.
           </div>
-          <div class="workflow-step">
-            <div class="step-number">4</div>
-            <div class="step-description">
-              <strong>Запись результата</strong><br />
-              Результат сохраняется в регистр или память.
-            </div>
+        </div>
+        <div class="workflow-step">
+          <div class="step-number">4</div>
+          <div class="step-description">
+            <strong>Запись результата</strong><br />
+            Результат сохраняется в регистр или память.
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="component-block">
-        <div class="component-icon">🧠</div>
-        <h3>2. Оперативная память (RAM)</h3>
+    <div id="ram" class="component-block">
+      <div class="component-icon">🧠</div>
+      <h3>2. Оперативная память (RAM)</h3>
 
-        <!-- Общая информация -->
-        <div class="cpu-component">
-          <h4>Общая информация</h4>
-          <p>
-            Оперативная память (RAM, Random Access Memory) — это энергозависимый
-            тип памяти, используемый для временного хранения данных и команд,
-            необходимых процессору для выполнения операций. Она обеспечивает
-            высокую скорость доступа к информации, что критично для
-            производительности системы.
-          </p>
-          <ul class="spec-list">
-            <li>
-              <strong>Функция:</strong> Временное хранение данных для быстрого
-              доступа процессора.
-            </li>
-            <li>
-              <strong>Энергозависимость:</strong> Данные теряются при отключении
-              питания.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Типы памяти -->
-        <div class="cpu-component">
-          <h4>Типы памяти</h4>
-          <ul class="cache-list">
-            <li>
-              <strong>DRAM (Dynamic RAM):</strong> Динамическая память,
-              требующая периодической регенерации для сохранения данных.
-            </li>
-            <li>
-              <strong>SDRAM (Synchronous DRAM):</strong> Синхронная динамическая
-              память, работающая в такт с частотой системной шины.
-            </li>
-            <li>
-              <strong>DDR (Double Data Rate):</strong> Усовершенствованная
-              версия SDRAM с удвоенной скоростью передачи данных. Включает
-              поколения DDR2, DDR3, DDR4 и DDR5.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Скорость -->
-        <div class="cpu-component">
-          <h4>Скорость</h4>
-          <p>
-            Скорость оперативной памяти измеряется в мегагерцах (MHz) и
-            определяет, насколько быстро данные могут быть переданы процессору.
-            Современные модули DDR4 работают на частотах от 2133 до 3200 MHz, а
-            DDR5 — от 4800 до 6400 MHz.
-          </p>
-        </div>
-
-        <!-- Объём памяти -->
-        <div class="cpu-component">
-          <h4>Объём</h4>
-          <p>
-            Объём оперативной памяти влияет на производительность системы и
-            зависит от типа задач:
-          </p>
-          <ul class="spec-list">
-            <li>
-              <strong>4–8 ГБ:</strong> Подходит для базовых задач, таких как
-              работа с документами и веб-сёрфинг.
-            </li>
-            <li>
-              <strong>8–16 ГБ:</strong> Оптимально для современных игр,
-              мультимедиа и многозадачности.
-            </li>
-            <li>
-              <strong>16–32 ГБ:</strong> Рекомендуется для профессиональных
-              задач, таких как видеомонтаж, 3D-моделирование и сложные
-              вычисления.
-            </li>
-            <li>
-              <strong>32 ГБ и выше:</strong> Используется в серверах, рабочих
-              станциях и для специализированных задач.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Принцип работы -->
-        <div class="cpu-component">
-          <h4>Принцип работы</h4>
-          <ul class="work-steps">
-            <li>
-              <strong>Инициализация:</strong> При включении компьютера
-              оперативная память очищается и подготавливается к работе.
-            </li>
-            <li>
-              <strong>Загрузка данных:</strong> Данные и инструкции загружаются
-              из постоянного хранилища (HDD или SSD) в оперативную память.
-            </li>
-            <li>
-              <strong>Доступ:</strong> Процессор запрашивает данные из
-              оперативной памяти через системную шину.
-            </li>
-            <li>
-              <strong>Обновление:</strong> В случае DRAM требуется периодическая
-              регенерация для поддержания целостности данных.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Современные стандарты -->
-        <div class="cpu-component">
-          <h4>Современные стандарты</h4>
-          <ul class="spec-list">
-            <li>
-              <strong>DDR4:</strong> Работает на частотах 2133–3200 MHz, широко
-              используется в современных системах.
-            </li>
-            <li>
-              <strong>DDR5:</strong> Новый стандарт с частотами 4800–6400 MHz,
-              увеличенной пропускной способностью и энергоэффективностью.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Совместимость поколений -->
-        <div class="cpu-component">
-          <h4>Совместимость поколений</h4>
-          <p>
-            Оперативная память разных поколений (DDR3, DDR4, DDR5) несовместима
-            между собой по следующим причинам:
-          </p>
-          <ul class="spec-list">
-            <li>
-              Разное расположение ключевого выреза на модуле, что предотвращает
-              установку неподходящего типа памяти.
-            </li>
-            <li>Различия в напряжении питания и архитектуре работы.</li>
-          </ul>
-          <p>
-            Для корректной работы оперативной памяти необходимо, чтобы её тип
-            поддерживался материнской платой и процессором.
-          </p>
-        </div>
+      <!-- Общая информация -->
+      <div class="cpu-component">
+        <h4>Общая информация</h4>
+        <p>
+          Оперативная память (RAM, Random Access Memory) — это энергозависимый
+          тип памяти, используемый для временного хранения данных и команд,
+          необходимых процессору для выполнения операций. Она обеспечивает
+          высокую скорость доступа к информации, что критично для
+          производительности системы.
+        </p>
+        <ul class="spec-list">
+          <li>
+            <strong>Функция:</strong> Временное хранение данных для быстрого
+            доступа процессора.
+          </li>
+          <li>
+            <strong>Энергозависимость:</strong> Данные теряются при отключении
+            питания.
+          </li>
+        </ul>
       </div>
 
-      <div class="component-block">
-        <div class="component-icon">🎮</div>
-        <h3>3. Видеокарта (GPU)</h3>
-
-        <!-- Общая информация -->
-        <div class="cpu-component">
-          <h4>Общая информация</h4>
-          <p>
-            Видеокарта (GPU, Graphics Processing Unit) — это устройство,
-            отвечающее за обработку графики и вывод изображения на экран.
-            Современные видеокарты используются не только для игр, но и для
-            задач машинного обучения, рендеринга и научных вычислений.
-          </p>
-          <ul class="spec-list">
-            <li>
-              <strong>Основная задача:</strong> Обработка графики и вывод
-              изображения.
-            </li>
-            <li>
-              <strong>Энергопотребление:</strong> Современные видеокарты могут
-              потреблять до 350 Вт и более.
-            </li>
-            <li><strong>Производители:</strong> NVIDIA, AMD, Intel.</li>
-          </ul>
-        </div>
-
-        <!-- Основные компоненты -->
-        <div class="cpu-component">
-          <h4>Основные компоненты</h4>
-          <ul class="spec-list">
-            <li>
-              <strong>Графический процессор (GPU):</strong> Основной
-              вычислительный блок, отвечающий за обработку графики.
-            </li>
-            <li>
-              <strong>Видеопамять (VRAM):</strong> Высокоскоростная память для
-              хранения текстур, кадров и других данных.
-            </li>
-            <li>
-              <strong>Система охлаждения:</strong> Вентиляторы или радиаторы для
-              отвода тепла.
-            </li>
-            <li>
-              <strong>Интерфейсы:</strong> HDMI, DisplayPort, DVI для
-              подключения мониторов.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Типы видеокарт -->
-        <div class="cpu-component">
-          <h4>Типы видеокарт</h4>
-          <ul class="spec-list">
-            <li>
-              <strong>Интегрированные:</strong> Встроены в процессор или
-              материнскую плату, подходят для базовых задач.
-            </li>
-            <li>
-              <strong>Дискретные:</strong> Отдельные платы с собственной памятью
-              и высокой производительностью.
-            </li>
-            <li>
-              <strong>Внешние:</strong> Подключаются через Thunderbolt или
-              USB-C, используются для ноутбуков.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Современные стандарты -->
-        <div class="cpu-component">
-          <h4>Современные стандарты</h4>
-          <ul class="spec-list">
-            <li>
-              <strong>NVIDIA:</strong> Серии RTX 50xx (Blackwell), поддерживают
-              трассировку лучей и DLSS 4.0.
-            </li>
-            <li>
-              <strong>AMD:</strong> Серии Radeon RX 7000 (RDNA 3), с улучшенной
-              энергоэффективностью.
-            </li>
-            <li>
-              <strong>Intel:</strong> Серия Arc, ориентирована на бюджетный и
-              средний сегмент.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Принцип работы -->
-        <div class="cpu-component">
-          <h4>Принцип работы</h4>
-          <ul class="work-steps">
-            <li>
-              <strong>Получение данных:</strong> Видеокарта получает данные от
-              процессора через шину PCI Express.
-            </li>
-            <li>
-              <strong>Обработка графики:</strong> GPU выполняет расчёты для
-              создания изображения.
-            </li>
-            <li>
-              <strong>Хранение текстур:</strong> Текстуры и другие данные
-              хранятся в видеопамяти (VRAM).
-            </li>
-            <li>
-              <strong>Вывод изображения:</strong> Готовое изображение передаётся
-              на монитор через интерфейсы HDMI или DisplayPort.
-            </li>
-          </ul>
-        </div>
+      <!-- Типы памяти -->
+      <div class="cpu-component">
+        <h4>Типы памяти</h4>
+        <ul class="cache-list">
+          <li>
+            <strong>DRAM (Dynamic RAM):</strong> Динамическая память,
+            требующая периодической регенерации для сохранения данных.
+          </li>
+          <li>
+            <strong>SDRAM (Synchronous DRAM):</strong> Синхронная динамическая
+            память, работающая в такт с частотой системной шины.
+          </li>
+          <li>
+            <strong>DDR (Double Data Rate):</strong> Усовершенствованная
+            версия SDRAM с удвоенной скоростью передачи данных. Включает
+            поколения DDR2, DDR3, DDR4 и DDR5.
+          </li>
+        </ul>
       </div>
 
-      <div class="component-block">
-        <div class="component-icon">🔌</div>
-        <h3>4. Материнская плата</h3>
-
-        <!-- Общая информация -->
-        <div class="cpu-component">
-          <h4>Общая информация</h4>
-          <p>
-            Материнская плата — это основная плата компьютера, которая
-            обеспечивает соединение всех компонентов системы. Она определяет,
-            какие процессоры, память и устройства могут быть установлены, а
-            также влияет на производительность и возможности компьютера.
-          </p>
-          <ul class="spec-list">
-            <li>
-              <strong>Основная задача:</strong> Обеспечение взаимодействия всех
-              компонентов компьютера.
-            </li>
-            <li><strong>Форм-факторы:</strong> ATX, Micro-ATX, Mini-ITX.</li>
-            <li>
-              <strong>Производители:</strong> ASUS, MSI, Gigabyte, ASRock.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Основные компоненты -->
-        <div class="cpu-component">
-          <h4>Основные компоненты</h4>
-          <ul class="spec-list">
-            <li>
-              <strong>Сокет процессора:</strong> Разъём для установки
-              процессора. Тип сокета зависит от производителя (Intel или AMD) и
-              поколения.
-            </li>
-            <li>
-              <strong>Чипсет:</strong> Управляет взаимодействием между
-              процессором, памятью и другими устройствами.
-            </li>
-            <li>
-              <strong>Слоты оперативной памяти (DIMM):</strong> Для установки
-              модулей RAM. Современные платы поддерживают DDR4 или DDR5.
-            </li>
-            <li>
-              <strong>Слоты расширения (PCIe):</strong> Для установки видеокарт,
-              сетевых карт и других устройств.
-            </li>
-            <li>
-              <strong>Разъёмы SATA и M.2:</strong> Для подключения накопителей
-              (HDD, SSD).
-            </li>
-            <li>
-              <strong>Порты ввода-вывода:</strong> USB, HDMI, Ethernet,
-              аудиоразъёмы и другие.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Форм-факторы -->
-        <div class="cpu-component">
-          <h4>Форм-факторы</h4>
-          <ul class="spec-list">
-            <li>
-              <strong>ATX:</strong> Стандартный размер (305 × 244 мм), подходит
-              для мощных систем.
-            </li>
-            <li>
-              <strong>Micro-ATX:</strong> Уменьшенный размер (244 × 244 мм),
-              подходит для компактных ПК.
-            </li>
-            <li>
-              <strong>Mini-ITX:</strong> Миниатюрный размер (170 × 170 мм),
-              используется в компактных и энергоэффективных системах.
-            </li>
-          </ul>
-        </div>
-
-        <!-- Чипсеты -->
-        <div class="cpu-component">
-          <h4>Чипсеты</h4>
-          <ul class="spec-list">
-            <li>
-              <strong>Intel:</strong> Z790 (для высокопроизводительных систем),
-              B760 (для среднего уровня), H710 (для базовых систем).
-            </li>
-            <li>
-              <strong>AMD:</strong> X670 (для энтузиастов), B650 (для
-              mainstream), A620 (для бюджетных систем).
-            </li>
-          </ul>
-        </div>
-
-        <!-- Принцип работы -->
-        <div class="cpu-component">
-          <h4>Принцип работы</h4>
-          <ul class="work-steps">
-            <li>
-              <strong>Инициализация:</strong> При включении компьютера BIOS/UEFI
-              проверяет подключённые устройства.
-            </li>
-            <li>
-              <strong>Загрузка ОС:</strong> BIOS/UEFI передаёт управление
-              операционной системе.
-            </li>
-            <li>
-              <strong>Координация:</strong> Чипсет управляет передачей данных
-              между процессором, памятью и другими устройствами.
-            </li>
-            <li>
-              <strong>Расширение:</strong> Через слоты PCIe и разъёмы SATA/M.2
-              подключаются дополнительные устройства.
-            </li>
-          </ul>
-        </div>
+      <!-- Скорость -->
+      <div class="cpu-component">
+        <h4>Скорость</h4>
+        <p>
+          Скорость оперативной памяти измеряется в мегагерцах (MHz) и
+          определяет, насколько быстро данные могут быть переданы процессору.
+          Современные модули DDR4 работают на частотах от 2133 до 3200 MHz, а
+          DDR5 — от 4800 до 6400 MHz.
+        </p>
       </div>
 
-      <div class="component-block">
-        <div class="component-icon">💾</div>
-        <h3>5. Накопители данных</h3>
+      <!-- Объём памяти -->
+      <div class="cpu-component">
+        <h4>Объём</h4>
+        <p>
+          Объём оперативной памяти влияет на производительность системы и
+          зависит от типа задач:
+        </p>
+        <ul class="spec-list">
+          <li>
+            <strong>4–8 ГБ:</strong> Подходит для базовых задач, таких как
+            работа с документами и веб-сёрфинг.
+          </li>
+          <li>
+            <strong>8–16 ГБ:</strong> Оптимально для современных игр,
+            мультимедиа и многозадачности.
+          </li>
+          <li>
+            <strong>16–32 ГБ:</strong> Рекомендуется для профессиональных
+            задач, таких как видеомонтаж, 3D-моделирование и сложные
+            вычисления.
+          </li>
+          <li>
+            <strong>32 ГБ и выше:</strong> Используется в серверах, рабочих
+            станциях и для специализированных задач.
+          </li>
+        </ul>
+      </div>
 
-        <!-- Общая информация -->
-        <div class="cpu-component">
-          <h4>Общая информация</h4>
-          <p>
-            Накопители данных — это устройства для хранения информации в
-            компьютере. Они различаются по типу, скорости и принципу работы.
-            Основные виды накопителей: HDD (жёсткие диски) и SSD (твердотельные
-            накопители).
-          </p>
-          <ul class="spec-list">
-            <li>
-              <strong>Основная задача:</strong> Хранение данных и обеспечение
-              быстрого доступа к ним.
-            </li>
-            <li><strong>Типы накопителей:</strong> HDD, SSD.</li>
-            <li>
-              <strong>Производители:</strong> Seagate, Western Digital, Samsung,
-              Kingston.
-            </li>
-          </ul>
-        </div>
+      <!-- Принцип работы -->
+      <div class="cpu-component">
+        <h4>Принцип работы</h4>
+        <ul class="work-steps">
+          <li>
+            <strong>Инициализация:</strong> При включении компьютера
+            оперативная память очищается и подготавливается к работе.
+          </li>
+          <li>
+            <strong>Загрузка данных:</strong> Данные и инструкции загружаются
+            из постоянного хранилища (HDD или SSD) в оперативную память.
+          </li>
+          <li>
+            <strong>Доступ:</strong> Процессор запрашивает данные из
+            оперативной памяти через системную шину.
+          </li>
+          <li>
+            <strong>Обновление:</strong> В случае DRAM требуется периодическая
+            регенерация для поддержания целостности данных.
+          </li>
+        </ul>
+      </div>
 
-        <!-- HDD (Жёсткие диски) -->
-        <div class="cpu-component">
-          <h4>HDD (Жёсткие диски)</h4>
-          <p>
-            HDD (Hard Disk Drive) — это традиционные накопители, использующие
-            магнитные диски для хранения данных. Они медленнее, чем SSD, но
-            предлагают большой объём памяти по низкой цене.
-          </p>
-          <ul class="spec-list">
-            <li>
-              <strong>Магнитные диски:</strong> Данные записываются на
-              вращающиеся магнитные пластины.
-            </li>
-            <li>
-              <strong>Головка чтения/записи:</strong> Перемещается над
-              поверхностью диска для доступа к данным.
-            </li>
-            <li>
-              <strong>Скорость вращения:</strong> Обычно 5400 или 7200 оборотов
-              в минуту (RPM).
-            </li>
-            <li>
-              <strong>Преимущества:</strong> Низкая стоимость за гигабайт,
-              большой объём (до 20 ТБ).
-            </li>
-            <li>
-              <strong>Недостатки:</strong> Медленная скорость, чувствительность
-              к механическим повреждениям.
-            </li>
-          </ul>
-        </div>
+      <!-- Современные стандарты -->
+      <div class="cpu-component">
+        <h4>Современные стандарты</h4>
+        <ul class="spec-list">
+          <li>
+            <strong>DDR4:</strong> Работает на частотах 2133–3200 MHz, широко
+            используется в современных системах.
+          </li>
+          <li>
+            <strong>DDR5:</strong> Новый стандарт с частотами 4800–6400 MHz,
+            увеличенной пропускной способностью и энергоэффективностью.
+          </li>
+        </ul>
+      </div>
 
-        <!-- SSD (Твердотельные накопители) -->
-        <div class="cpu-component">
-          <h4>SSD (Твердотельные накопители)</h4>
-          <p>
-            SSD (Solid State Drive) — это современные накопители, использующие
-            флеш-память для хранения данных. Они значительно быстрее HDD и не
-            имеют движущихся частей.
-          </p>
-          <ul class="spec-list">
-            <li>
-              <strong>Флеш-память:</strong> Данные хранятся в ячейках памяти
-              NAND.
-            </li>
-            <li>
-              <strong>Контроллер:</strong> Управляет чтением и записью данных.
-            </li>
-            <li>
-              <strong>Типы памяти:</strong> SLC (однобитовые ячейки), MLC
-              (двухбитовые), TLC (трёхбитовые), QLC (четырёхбитовые).
-            </li>
-            <li>
-              <strong>Преимущества:</strong> Высокая скорость, устойчивость к
-              ударам, низкое энергопотребление.
-            </li>
-            <li>
-              <strong>Недостатки:</strong> Ограниченное количество циклов
-              записи, высокая стоимость за гигабайт.
-            </li>
-          </ul>
-        </div>
+      <!-- Совместимость поколений -->
+      <div class="cpu-component">
+        <h4>Совместимость поколений</h4>
+        <p>
+          Оперативная память разных поколений (DDR3, DDR4, DDR5) несовместима
+          между собой по следующим причинам:
+        </p>
+        <ul class="spec-list">
+          <li>
+            Разное расположение ключевого выреза на модуле, что предотвращает
+            установку неподходящего типа памяти.
+          </li>
+          <li>Различия в напряжении питания и архитектуре работы.</li>
+        </ul>
+        <p>
+          Для корректной работы оперативной памяти необходимо, чтобы её тип
+          поддерживался материнской платой и процессором.
+        </p>
+      </div>
+    </div>
 
-        <!-- NVMe (Высокоскоростные SSD) -->
-        <div class="cpu-component">
-          <h4>NVMe (Высокоскоростные SSD)</h4>
-          <p>
-            NVMe (Non-Volatile Memory Express) — это SSD, использующие интерфейс
-            PCIe для достижения максимальной скорости. Они идеальны для задач,
-            требующих высокой производительности.
-          </p>
-          <ul class="spec-list">
-                <li>
-                  <strong>Интерфейс PCIe:</strong> Обеспечивает высокую
-                  пропускную способность.
-                </li>
-                <li>
-                  <strong>Параллельная обработка:</strong> NVMe поддерживает
-                  множество одновременных операций.
-                </li>
-                <li><strong>Форм-фактор:</strong> M.2 или U.2.</li>
-            <li>
-              <strong>Преимущества:</strong> Очень высокая скорость (до 7000
-              МБ/с), низкая задержка.
-            </li>
-            <li>
-              <strong>Недостатки:</strong> Высокая стоимость, ограниченный объём
-              (до 4 ТБ).
-            </li>
-          </ul>
-        </div>
+    <div id="gpu" class="component-block">
+      <div class="component-icon">🎮</div>
+      <h3>3. Видеокарта (GPU)</h3>
 
-        <!-- Сравнение накопителей -->
-        <div class="cpu-component">
-          <h4>Сравнение накопителей</h4>
-          <table class="storage-table">
+      <!-- Общая информация -->
+      <div class="cpu-component">
+        <h4>Общая информация</h4>
+        <p>
+          Видеокарта (GPU, Graphics Processing Unit) — это устройство,
+          отвечающее за обработку графики и вывод изображения на экран.
+          Современные видеокарты используются не только для игр, но и для
+          задач машинного обучения, рендеринга и научных вычислений.
+        </p>
+        <ul class="spec-list">
+          <li>
+            <strong>Основная задача:</strong> Обработка графики и вывод
+            изображения.
+          </li>
+          <li>
+            <strong>Энергопотребление:</strong> Современные видеокарты могут
+            потреблять до 350 Вт и более.
+          </li>
+          <li><strong>Производители:</strong> NVIDIA, AMD, Intel.</li>
+        </ul>
+      </div>
+
+      <!-- Основные компоненты -->
+      <div class="cpu-component">
+        <h4>Основные компоненты</h4>
+        <ul class="spec-list">
+          <li>
+            <strong>Графический процессор (GPU):</strong> Основной
+            вычислительный блок, отвечающий за обработку графики.
+          </li>
+          <li>
+            <strong>Видеопамять (VRAM):</strong> Высокоскоростная память для
+            хранения текстур, кадров и других данных.
+          </li>
+          <li>
+            <strong>Система охлаждения:</strong> Вентиляторы или радиаторы для
+            отвода тепла.
+          </li>
+          <li>
+            <strong>Интерфейсы:</strong> HDMI, DisplayPort, DVI для
+            подключения мониторов.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Типы видеокарт -->
+      <div class="cpu-component">
+        <h4>Типы видеокарт</h4>
+        <ul class="spec-list">
+          <li>
+            <strong>Интегрированные:</strong> Встроены в процессор или
+            материнскую плату, подходят для базовых задач.
+          </li>
+          <li>
+            <strong>Дискретные:</strong> Отдельные платы с собственной памятью
+            и высокой производительностью.
+          </li>
+          <li>
+            <strong>Внешние:</strong> Подключаются через Thunderbolt или
+            USB-C, используются для ноутбуков.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Современные стандарты -->
+      <div class="cpu-component">
+        <h4>Современные стандарты</h4>
+        <ul class="spec-list">
+          <li>
+            <strong>NVIDIA:</strong> Серии RTX 50xx (Blackwell), поддерживают
+            трассировку лучей и DLSS 4.0.
+          </li>
+          <li>
+            <strong>AMD:</strong> Серии Radeon RX 7000 (RDNA 3), с улучшенной
+            энергоэффективностью.
+          </li>
+          <li>
+            <strong>Intel:</strong> Серия Arc, ориентирована на бюджетный и
+            средний сегмент.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Принцип работы -->
+      <div class="cpu-component">
+        <h4>Принцип работы</h4>
+        <ul class="work-steps">
+          <li>
+            <strong>Получение данных:</strong> Видеокарта получает данные от
+            процессора через шину PCI Express.
+          </li>
+          <li>
+            <strong>Обработка графики:</strong> GPU выполняет расчёты для
+            создания изображения.
+          </li>
+          <li>
+            <strong>Хранение текстур:</strong> Текстуры и другие данные
+            хранятся в видеопамяти (VRAM).
+          </li>
+          <li>
+            <strong>Вывод изображения:</strong> Готовое изображение передаётся
+            на монитор через интерфейсы HDMI или DisplayPort.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="motherboard" class="component-block">
+      <div class="component-icon">🔌</div>
+      <h3>4. Материнская плата</h3>
+
+      <!-- Общая информация -->
+      <div class="cpu-component">
+        <h4>Общая информация</h4>
+        <p>
+          Материнская плата — это основная плата компьютера, которая
+          обеспечивает соединение всех компонентов системы. Она определяет,
+          какие процессоры, память и устройства могут быть установлены, а
+          также влияет на производительность и возможности компьютера.
+        </p>
+        <ul class="spec-list">
+          <li>
+            <strong>Основная задача:</strong> Обеспечение взаимодействия всех
+            компонентов компьютера.
+          </li>
+          <li><strong>Форм-факторы:</strong> ATX, Micro-ATX, Mini-ITX.</li>
+          <li>
+            <strong>Производители:</strong> ASUS, MSI, Gigabyte, ASRock.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Основные компоненты -->
+      <div class="cpu-component">
+        <h4>Основные компоненты</h4>
+        <ul class="spec-list">
+          <li>
+            <strong>Сокет процессора:</strong> Разъём для установки
+            процессора. Тип сокета зависит от производителя (Intel или AMD) и
+            поколения.
+          </li>
+          <li>
+            <strong>Чипсет:</strong> Управляет взаимодействием между
+            процессором, памятью и другими устройствами.
+          </li>
+          <li>
+            <strong>Слоты оперативной памяти (DIMM):</strong> Для установки
+            модулей RAM. Современные платы поддерживают DDR4 или DDR5.
+          </li>
+          <li>
+            <strong>Слоты расширения (PCIe):</strong> Для установки видеокарт,
+            сетевых карт и других устройств.
+          </li>
+          <li>
+            <strong>Разъёмы SATA и M.2:</strong> Для подключения накопителей
+            (HDD, SSD).
+          </li>
+          <li>
+            <strong>Порты ввода-вывода:</strong> USB, HDMI, Ethernet,
+            аудиоразъёмы и другие.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Форм-факторы -->
+      <div class="cpu-component">
+        <h4>Форм-факторы</h4>
+        <ul class="spec-list">
+          <li>
+            <strong>ATX:</strong> Стандартный размер (305 × 244 мм), подходит
+            для мощных систем.
+          </li>
+          <li>
+            <strong>Micro-ATX:</strong> Уменьшенный размер (244 × 244 мм),
+            подходит для компактных ПК.
+          </li>
+          <li>
+            <strong>Mini-ITX:</strong> Миниатюрный размер (170 × 170 мм),
+            используется в компактных и энергоэффективных системах.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Чипсеты -->
+      <div class="cpu-component">
+        <h4>Чипсеты</h4>
+        <ul class="spec-list">
+          <li>
+            <strong>Intel:</strong> Z790 (для высокопроизводительных систем),
+            B760 (для среднего уровня), H710 (для базовых систем).
+          </li>
+          <li>
+            <strong>AMD:</strong> X670 (для энтузиастов), B650 (для
+            mainstream), A620 (для бюджетных систем).
+          </li>
+        </ul>
+      </div>
+
+      <!-- Принцип работы -->
+      <div class="cpu-component">
+        <h4>Принцип работы</h4>
+        <ul class="work-steps">
+          <li>
+            <strong>Инициализация:</strong> При включении компьютера BIOS/UEFI
+            проверяет подключённые устройства.
+          </li>
+          <li>
+            <strong>Загрузка ОС:</strong> BIOS/UEFI передаёт управление
+            операционной системе.
+          </li>
+          <li>
+            <strong>Координация:</strong> Чипсет управляет передачей данных
+            между процессором, памятью и другими устройствами.
+          </li>
+          <li>
+            <strong>Расширение:</strong> Через слоты PCIe и разъёмы SATA/M.2
+            подключаются дополнительные устройства.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="storage" class="component-block">
+      <div class="component-icon">💾</div>
+      <h3>5. Накопители данных</h3>
+
+      <!-- Общая информация -->
+      <div class="cpu-component">
+        <h4>Общая информация</h4>
+        <p>
+          Накопители данных — это устройства для хранения информации в
+          компьютере. Они различаются по типу, скорости и принципу работы.
+          Основные виды накопителей: HDD (жёсткие диски) и SSD (твердотельные
+          накопители).
+        </p>
+        <ul class="spec-list">
+          <li>
+            <strong>Основная задача:</strong> Хранение данных и обеспечение
+            быстрого доступа к ним.
+          </li>
+          <li><strong>Типы накопителей:</strong> HDD, SSD.</li>
+          <li>
+            <strong>Производители:</strong> Seagate, Western Digital, Samsung,
+            Kingston.
+          </li>
+        </ul>
+      </div>
+
+      <!-- HDD (Жёсткие диски) -->
+      <div class="cpu-component">
+        <h4>HDD (Жёсткие диски)</h4>
+        <p>
+          HDD (Hard Disk Drive) — это традиционные накопители, использующие
+          магнитные диски для хранения данных. Они медленнее, чем SSD, но
+          предлагают большой объём памяти по низкой цене.
+        </p>
+        <ul class="spec-list">
+          <li>
+            <strong>Магнитные диски:</strong> Данные записываются на
+            вращающиеся магнитные пластины.
+          </li>
+          <li>
+            <strong>Головка чтения/записи:</strong> Перемещается над
+            поверхностью диска для доступа к данным.
+          </li>
+          <li>
+            <strong>Скорость вращения:</strong> Обычно 5400 или 7200 оборотов
+            в минуту (RPM).
+          </li>
+          <li>
+            <strong>Преимущества:</strong> Низкая стоимость за гигабайт,
+            большой объём (до 20 ТБ).
+          </li>
+          <li>
+            <strong>Недостатки:</strong> Медленная скорость, чувствительность
+            к механическим повреждениям.
+          </li>
+        </ul>
+      </div>
+
+      <!-- SSD (Твердотельные накопители) -->
+      <div class="cpu-component">
+        <h4>SSD (Твердотельные накопители)</h4>
+        <p>
+          SSD (Solid State Drive) — это современные накопители, использующие
+          флеш-память для хранения данных. Они значительно быстрее HDD и не
+          имеют движущихся частей.
+        </p>
+        <ul class="spec-list">
+          <li>
+            <strong>Флеш-память:</strong> Данные хранятся в ячейках памяти
+            NAND.
+          </li>
+          <li>
+            <strong>Контроллер:</strong> Управляет чтением и записью данных.
+          </li>
+          <li>
+            <strong>Типы памяти:</strong> SLC (однобитовые ячейки), MLC
+            (двухбитовые), TLC (трёхбитовые), QLC (четырёхбитовые).
+          </li>
+          <li>
+            <strong>Преимущества:</strong> Высокая скорость, устойчивость к
+            ударам, низкое энергопотребление.
+          </li>
+          <li>
+            <strong>Недостатки:</strong> Ограниченное количество циклов
+            записи, высокая стоимость за гигабайт.
+          </li>
+        </ul>
+      </div>
+
+      <!-- NVMe (Высокоскоростные SSD) -->
+      <div class="cpu-component">
+        <h4>NVMe (Высокоскоростные SSD)</h4>
+        <p>
+          NVMe (Non-Volatile Memory Express) — это SSD, использующие интерфейс
+          PCIe для достижения максимальной скорости. Они идеальны для задач,
+          требующих высокой производительности.
+        </p>
+        <ul class="spec-list">
+          <li>
+            <strong>Интерфейс PCIe:</strong> Обеспечивает высокую пропускную
+            способность.
+          </li>
+          <li>
+            <strong>Параллельная обработка:</strong> NVMe поддерживает
+            множество одновременных операций.
+          </li>
+          <li><strong>Форм-фактор:</strong> M.2 или U.2.</li>
+          <li>
+            <strong>Преимущества:</strong> Очень высокая скорость (до 7000
+            МБ/с), низкая задержка.
+          </li>
+          <li>
+            <strong>Недостатки:</strong> Высокая стоимость, ограниченный объём
+            (до 4 ТБ).
+          </li>
+        </ul>
+      </div>
+
+      <!-- Сравнение накопителей -->
+      <div class="cpu-component">
+        <h4>Сравнение накопителей</h4>
+        <table class="storage-table">
+          <thead>
             <tr>
               <th>Тип</th>
               <th>Пример</th>
               <th>Скорость</th>
               <th>Ёмкость</th>
             </tr>
+          </thead>
+          <tbody>
             <tr>
               <td>HDD</td>
               <td>Seagate Barracuda</td>
@@ -919,27 +1188,141 @@
               <td>До 12000 МБ/с</td>
               <td>До 8 ТБ</td>
             </tr>
-          </table>
-        </div>
-      </div>
-
-      <div class="scheme">
-        <h3>Схема взаимодействия компонентов</h3>
-        <div class="scheme-flow">
-          <div class="flow-item">Процессор</div>
-          <div class="flow-arrow">⇅</div>
-          <div class="flow-item">Оперативная память</div>
-          <div class="flow-arrow">⇅</div>
-          <div class="flow-item">Материнская плата</div>
-          <div class="flow-arrow">↙↘</div>
-          <div class="flow-item">Накопители</div>
-          <div class="flow-item">Видеокарта</div>
-        </div>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div id="lecture-2" class="lecture" style="display: none">
-      <h2>Лекция 2: Архитектура ПОИС</h2>
+    <div id="bios" class="component-block">
+      <div class="component-icon">⚡</div>
+      <h3>6. BIOS/UEFI</h3>
+
+      <!-- Общая информация -->
+      <div class="cpu-component">
+        <h4>Общая информация</h4>
+        <p>
+          BIOS (Basic Input/Output System) и UEFI (Unified Extensible Firmware Interface) — это микропрограммы, которые
+          обеспечивают начальную загрузку компьютера и настройку оборудования. Они являются связующим звеном между
+          аппаратным обеспечением и операционной системой.
+        </p>
+        <ul class="spec-list">
+          <li>
+            <strong>Основная задача:</strong> Инициализация и тестирование оборудования (POST), загрузка операционной
+            системы.
+          </li>
+          <li>
+            <strong>Типы:</strong> BIOS (устаревший), UEFI (современный).
+          </li>
+          <li>
+            <strong>Производители:</strong> AMI, Phoenix, Insyde.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Основные функции -->
+      <div class="cpu-component">
+        <h4>Основные функции</h4>
+        <ul class="spec-list">
+          <li>
+            <strong>POST (Power-On Self-Test):</strong> Проверка работоспособности оборудования перед загрузкой ОС.
+          </li>
+          <li>
+            <strong>Загрузка ОС:</strong> Поиск загрузчика на подключённых накопителях и передача управления
+            операционной системе.
+          </li>
+          <li>
+            <strong>Настройка оборудования:</strong> Управление параметрами процессора, памяти, накопителей и других
+            устройств.
+          </li>
+          <li>
+            <strong>Хранение настроек:</strong> Сохранение конфигурации в энергонезависимой памяти (CMOS).
+          </li>
+        </ul>
+      </div>
+
+      <!-- Различия между BIOS и UEFI -->
+      <div class="cpu-component">
+        <h4>Различия между BIOS и UEFI</h4>
+        <table class="storage-table">
+          <thead>
+            <tr>
+              <th>Характеристика</th>
+              <th>BIOS</th>
+              <th>UEFI</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Интерфейс</strong></td>
+              <td>Текстовый (обычно синий экран)</td>
+              <td>Графический (поддержка мыши)</td>
+            </tr>
+            <tr>
+              <td><strong>Скорость загрузки</strong></td>
+              <td>Медленная</td>
+              <td>Быстрая (благодаря параллельной инициализации)</td>
+            </tr>
+            <tr>
+              <td><strong>Поддержка дисков</strong></td>
+              <td>Только MBR (до 2 ТБ)</td>
+              <td>GPT (диски более 2 ТБ)</td>
+            </tr>
+            <tr>
+              <td><strong>Безопасность</strong></td>
+              <td>Нет поддержки Secure Boot</td>
+              <td>Поддержка Secure Boot (защита от вредоносного ПО)</td>
+            </tr>
+            <tr>
+              <td><strong>Совместимость</strong></td>
+              <td>Только 16-битный режим</td>
+              <td>32-битный и 64-битный режимы</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Принцип работы -->
+      <div class="cpu-component">
+        <h4>Принцип работы</h4>
+        <ul class="work-steps">
+          <li>
+            <strong>Инициализация:</strong> При включении компьютера BIOS/UEFI запускает POST для проверки оборудования.
+          </li>
+          <li>
+            <strong>Загрузка:</strong> BIOS/UEFI ищет загрузчик на подключённых накопителях (HDD, SSD, USB).
+          </li>
+          <li>
+            <strong>Передача управления:</strong> После нахождения загрузчика управление передаётся операционной
+            системе.
+          </li>
+          <li>
+            <strong>Настройка:</strong> Пользователь может изменить параметры оборудования через интерфейс BIOS/UEFI.
+          </li>
+        </ul>
+      </div>
+
+      <!-- Современные функции UEFI -->
+      <div class="cpu-component">
+        <h4>Современные функции UEFI</h4>
+        <ul class="spec-list">
+          <li>
+            <strong>Secure Boot:</strong> Защищает систему от загрузки неподписанного или вредоносного ПО.
+          </li>
+          <li>
+            <strong>Fast Boot:</strong> Ускоряет загрузку за счёт пропуска некоторых этапов инициализации.
+          </li>
+          <li>
+            <strong>Поддержка сетей:</strong> Возможность загрузки по сети (PXE) для тонких клиентов и серверов.
+          </li>
+          <li>
+            <strong>Графический интерфейс:</strong> Удобное управление с поддержкой мыши и локализованным интерфейсом.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div id="lecture-1" class="lecture" style="display: none">
+      <h2>Лекция 1</h2>
       <p><strong>Дата:</strong> 13.02.2025</p>
 
       <h3>Уровни архитектуры</h3>
@@ -954,71 +1337,193 @@
       <div class="badge">Микросервисная</div>
       <div class="badge">Сервис-ориентированная (SOA)</div>
     </div>
+  </div>
 
-    <div id="lecture-3" class="lecture" style="display: none">
-      <h2>Лекция 3: Жизненный цикл ПО</h2>
-      <p><strong>Дата:</strong> 20.02.2025</p>
+  <!-- Практика 0 -->
+<div id="practice-0" class="practice">
+  <h2>Практика 0</h2>
+  <p>
+    В этой практике мы установим и настроим виртуальную машину с использованием программы Oracle VirtualBox. В качестве операционныъ систем будут использоваться Windows и Linux.
+  </p>
 
-      <h3>Основные этапы</h3>
-      <ul>
-        <li>Сбор требований</li>
-        <li>Проектирование</li>
-        <li>Реализация</li>
-        <li>Тестирование</li>
-        <li>Внедрение</li>
-      </ul>
-    </div>
+  <h3>1. Подготовка</h3>
+  <div class="step-block">
+    <p>
+      Перед началом работы убедитесь, что у вас установлена программа Oracle VirtualBox (рекомендуемая версия – 6.1). Если программа не установлена, скачайте её с официального сайта:
+      <a href="https://www.virtualbox.org/" target="_blank">Oracle VirtualBox</a>.
+    </p>
+    <p>
+      Также подготовьте образы операционных систем:
+    </p>
+    <ul>
+      <li>
+        <strong>Windows:</strong> XP или новее (рекомендуется Windows 7). Образ можно скачать с сайта
+        <a href="http://book-9.narod.ru/" target="_blank">book-9.narod.ru</a>.
+      </li>
+      <li>
+        <strong>Linux:</strong> Любая версия без графической оболочки (например, Ubuntu). Образ можно скачать с официального сайта
+        <a href="https://ubuntu.com/download/server" target="_blank">Ubuntu Server</a>.
+      </li>
+    </ul>
+  </div>
 
-    <div id="lecture-4" class="lecture" style="display: none">
-      <h2>Лекция 4: Тестирование ПО</h2>
-      <p><strong>Дата:</strong> 27.02.2025</p>
+  <h3>2. Создание виртуальной машины</h3>
+  <div class="step-block">
+    <p>
+      Запустите Oracle VirtualBox и выполните следующие шаги:
+    </p>
+    <ol>
+      <li>
+        <strong>Имя и тип ОС:</strong>
+        <ul>
+          <li>Нажмите кнопку <span class="code">Создать</span>.</li>
+          <li>Укажите имя виртуальной машины (например, <span class="code">IS-2401-win7</span>).</li>
+          <li>Выберите тип ОС (например, <span class="code">Microsoft Windows</span>).</li>
+          <li>Выберите версию ОС (например, <span class="code">Windows 7 (64-bit)</span>).</li>
+        </ul>
+        <img src="images/vm-create-1.png" alt="Создание виртуальной машины">
+      </li>
+      <li>
+        <strong>Выделение оперативной памяти:</strong>
+        <ul>
+          <li>Укажите объём оперативной памяти (рекомендуется 2 ГБ для компьютеров в аудитории).</li>
+          <li>Если у вас мощный ноутбук, можно выделить больше (но не менее 1 ГБ).</li>
+        </ul>
+        <img src="images/vm-create-2.png" alt="Выделение оперативной памяти">
+      </li>
+      <li>
+        <strong>Создание виртуального жёсткого диска:</strong>
+        <ul>
+          <li>Выберите <span class="code">Создать новый виртуальный жёсткий диск</span>.</li>
+          <li>Тип файла: <span class="code">VDI (VirtualBox Disk Image)</span>.</li>
+          <li>Формат хранения: <span class="code">Динамический</span>.</li>
+          <li>Укажите имя файла и место хранения.</li>
+          <li>Задайте максимальный размер файла (рекомендуется 50 ГБ).</li>
+        </ul>
+        <img src="images/vm-create-3.png" alt="Создание виртуального диска">
+      </li>
+    </ol>
+  </div>
 
-      <h3>Виды тестирования</h3>
-      <table>
-        <tr>
-          <th>Тип</th>
-          <th>Инструменты</th>
-          <th>Цель</th>
-        </tr>
-        <tr>
-          <td>Юнит-тесты</td>
-          <td>JUnit, pytest</td>
-          <td>Проверка отдельных модулей</td>
-        </tr>
-        <tr>
-          <td>Интеграционное</td>
-          <td>Selenium, Postman</td>
-          <td>Проверка взаимодействия компонентов</td>
-        </tr>
-      </table>
-    </div>
+  <h3>3. Настройка виртуальной машины</h3>
+  <div class="step-block">
+    <p>
+      После создания виртуальной машины выполните её настройку:
+    </p>
+    <ol>
+      <li>
+        <strong>Общие настройки:</strong>
+        <ul>
+          <li>Перейдите в <span class="code">Настройки</span> → <span class="code">Общее</span> → <span class="code">Дополнительно</span>.</li>
+          <li>Установите <span class="code">Общий буфер обмена</span> и <span class="code">Drag'n'Drop</span> в режим <span class="code">Двунаправленный</span>.</li>
+        </ul>
+        <img src="images/vm-settings-1.png" alt="Общие настройки">
+      </li>
+      <li>
+        <strong>Система – материнская плата:</strong>
+        <ul>
+          <li>Перейдите в <span class="code">Система</span> → <span class="code">Материнская плата</span>.</li>
+          <li>Отключите <span class="code">Гибкий диск</span> в порядке загрузки.</li>
+        </ul>
+        <img src="images/vm-settings-2.png" alt="Настройка материнской платы">
+      </li>
+      <li>
+        <strong>Система – процессор:</strong>
+        <ul>
+          <li>Перейдите в <span class="code">Система</span> → <span class="code">Процессор</span>.</li>
+          <li>Выделите 1-2 ядра (для компьютеров в аудитории).</li>
+          <li>Если у вас мощный ноутбук, можно выделить больше ядер.</li>
+        </ul>
+        <img src="images/vm-settings-3.png" alt="Настройка процессора">
+      </li>
+      <li>
+        <strong>Дисплей – экран:</strong>
+        <ul>
+          <li>Перейдите в <span class="code">Дисплей</span> → <span class="code">Экран</span>.</li>
+          <li>Установите количество видеопамяти (рекомендуется 128 МБ).</li>
+        </ul>
+        <img src="images/vm-settings-4.png" alt="Настройка дисплея">
+      </li>
+      <li>
+        <strong>Носители:</strong>
+        <ul>
+          <li>Перейдите в <span class="code">Носители</span>.</li>
+          <li>Удалите пустой диск.</li>
+          <li>Правой кнопкой мыши (ПКМ) по контроллеру → <span class="code">Оптический диск</span> → <span class="code">Добавить</span>.</li>
+          <li>Выберите предварительно скачанный образ ОС (<span class="code">.iso</span>).</li>
+          <li>Включите <span class="code">Кэширование ввода/вывода</span>.</li>
+        </ul>
+        <img src="images/vm-settings-5.png" alt="Настройка носителей">
+      </li>
+      <li>
+        <strong>Аудио:</strong>
+        <ul>
+          <li>Перейдите в <span class="code">Аудио</span>.</li>
+          <li>Выключите аудио, если оно не требуется.</li>
+        </ul>
+        <img src="images/vm-settings-6.png" alt="Настройка аудио">
+      </li>
+    </ol>
+  </div>
 
-    <script>
-      function showLecture(lectureNumber) {
-        if (lectureNumber === 3) return;
+  <h3>4. Запуск виртуальной машины</h3>
+  <div class="step-block">
+    <p>
+      После завершения настройки нажмите кнопку <span class="code">Запустить</span>. Виртуальная машина начнёт загрузку с выбранного образа ОС. Следуйте инструкциям на экране для установки операционной системы.
+    </p>
+    <img src="images/vm-start.png" alt="Запуск виртуальной машины">
+  </div>
 
-        document.querySelectorAll(".lecture").forEach((lecture) => {
-          lecture.style.display = "none";
-        });
+  <h3>5. Дополнительные рекомендации</h3>
+  <div class="note">
+    <p>
+      <strong>Важно:</strong> Если вы работаете на компьютере в аудитории, сохраняйте виртуальную машину на внешний носитель или в облачное хранилище.
+    </p>
+  </div>
+  <div class="note">
+    <p>
+      <strong>Совет:</strong> Для повышения производительности виртуальной машины закройте все ненужные программы на основном компьютере.
+    </p>
+  </div>
+</div>
 
-        document.querySelectorAll(".lecture-btn").forEach((btn) => {
-          btn.classList.remove("active");
-        });
+  <!-- Практика 1 -->
+  <div id="practice-1" class="practice">
+    <h2>Практика 1</h2>
+    <p>Содержимое практики 1. Здесь может быть текст, задания, примеры кода и т.д.</p>
+    <ul>
+      <li>Задание 1: Описание задания.</li>
+      <li>Задание 2: Описание задания.</li>
+    </ul>
+  </div>
 
-        const selectedLecture = document.getElementById(
-          `lecture-${lectureNumber}`
-        );
-        if (selectedLecture) {
-          selectedLecture.style.display = "block";
-          document
-            .querySelector(`.lecture-btn:nth-child(${lectureNumber})`)
-            .classList.add("active");
-        }
+  <script>
+    // Функция для переключения между лекциями и практиками
+    function showTab(type, index) {
+      // Скрываем все лекции и практики
+      document.querySelectorAll(".lecture, .practice").forEach((tab) => {
+        tab.classList.remove("active");
+      });
+
+      // Убираем активный класс у всех кнопок
+      document.querySelectorAll(".lecture-btn, .practice-btn").forEach((btn) => {
+        btn.classList.remove("active");
+      });
+
+      // Показываем выбранный блок и делаем кнопку активной
+      const selectedTab = document.getElementById(`${type}-${index}`);
+      if (selectedTab) {
+        selectedTab.classList.add("active");
+        document
+          .querySelector(`.${type}-btn:nth-child(${index + 1})`)
+          .classList.add("active");
       }
-    </script>
+    }
+  </script>
 
-    <footer>
-      <p>© 2025 · by <em style="color: var(--accent)">marshel</em></p>
-    </footer>
-  </body>
+  <footer>
+    <p>© 2025 · by <em style="color: var(--accent)">marshel</em></p>
+  </footer>
+</body>
+
 </html>
